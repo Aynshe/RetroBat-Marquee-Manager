@@ -23,3 +23,4 @@ Install RetroBat, MPV Player and ImageMagick: Ensure RetroBat is set up correctl
 Use StartRetrobatMarquees.bat to launch RetroBat with the dynamic marquee system enabled. This script initializes everything necessary for the marquee system to function.
 You can also create a Windows startup shortcut to launch StartRetrobatMarquees.bat automatically.
 </p>
+
