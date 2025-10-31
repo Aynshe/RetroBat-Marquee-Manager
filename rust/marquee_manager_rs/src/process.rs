@@ -1,4 +1,5 @@
 use crate::config::Config;
+use log::{error, info};
 use std::path::Path;
 use std::process::{Command, Stdio};
 
@@ -14,7 +15,7 @@ pub fn launch_media_player(config: &Config) {
         .replace("{ScreenNumber}", &config.settings.screen_number.to_string())
         .replace("{DefaultImagePath}", config.settings.default_image_path.to_str().unwrap_or(""));
 
-    println!("Launching MPV with command: {}", launch_command);
+    info!("Launching MPV with command: {}", launch_command);
 
     let mut cmd = Command::new("cmd");
     cmd.arg("/C").arg(launch_command)
@@ -28,13 +29,13 @@ pub fn launch_media_player(config: &Config) {
     }
 
     match cmd.spawn() {
-        Ok(_) => println!("MPV launched successfully."),
-        Err(e) => eprintln!("Failed to launch MPV: {}", e),
+        Ok(_) => info!("MPV launched successfully."),
+        Err(e) => error!("Failed to launch MPV: {}", e),
     }
 }
 
 pub fn kill_media_player(config: &Config) {
-    println!("Killing MPV with command: {}", &config.settings.mpv_kill_command);
+    info!("Killing MPV with command: {}", &config.settings.mpv_kill_command);
     let _ = Command::new("cmd")
         .arg("/C")
         .arg(&config.settings.mpv_kill_command)
@@ -49,7 +50,7 @@ pub fn update_marquee(marquee_path: &Path, config: &Config) {
             .replace("{marquee_file}", marquee_path.to_str().unwrap_or(""))
             .replace("{IPCChannel}", &config.settings.ipc_channel);
 
-        println!("Updating marquee with command: {}", command);
+        info!("Updating marquee with command: {}", command);
         let _ = Command::new("cmd")
             .arg("/C")
             .arg(command)
