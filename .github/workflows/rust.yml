@@ -2,9 +2,9 @@ name: Rust
 
 on:
   push:
-    branches: [ "rust-conversion" ]
+    branches: [ "master" ]
   pull_request:
-    branches: [ "rust-conversion" ]
+    branches: [ "master" ]
 
 env:
   CARGO_TERM_COLOR: always
