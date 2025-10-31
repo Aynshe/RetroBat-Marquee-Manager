@@ -11,12 +11,16 @@ env:
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
+    strategy:
+      matrix:
+        crate: [marquee_manager_rs, retroachievements_rs, utility_rs]
 
     steps:
     - uses: actions/checkout@v4
     - name: Build
+      working-directory: rust/${{ matrix.crate }}
       run: cargo build --verbose
     - name: Run tests
+      working-directory: rust/${{ matrix.crate }}
       run: cargo test --verbose
