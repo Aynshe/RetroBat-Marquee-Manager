@@ -1,4 +1,4 @@
-name: Rust
+name: Rust CI/CD
 
 on:
   push:
@@ -18,9 +18,37 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-    - name: Build
+
+    - name: Build release binary
       working-directory: rust/${{ matrix.crate }}
-      run: cargo build --verbose
+      run: cargo build --release --verbose
+
     - name: Run tests
       working-directory: rust/${{ matrix.crate }}
       run: cargo test --verbose
+
+    - name: Upload binary artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{ matrix.crate }}
+        path: rust/${{ matrix.crate }}/target/release/${{ matrix.crate }}.exe
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push' && github.ref == 'refs/heads/master'
+
+    steps:
+    - name: Download all binary artifacts
+      uses: actions/download-artifact@v4
+      with:
+        path: artifacts
+
+    - name: Create Release and Upload Assets
+      uses: softprops/action-gh-release@v2
+      with:
+        tag_name: "build-${{ github.sha }}"
+        files: |
+          artifacts/marquee_manager_rs/marquee_manager_rs.exe
+          artifacts/retroachievements_rs/retroachievements_rs.exe
+          artifacts/utility_rs/utility_rs.exe
