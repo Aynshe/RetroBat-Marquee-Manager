@@ -31,7 +31,7 @@ pub struct Settings {
     #[serde(rename = "AcceptedFormats")]
     pub accepted_formats: String,
     #[serde(rename = "RetroBatPath")]
-    pub retrobat_path: PathBuf,
+    pub retrobat_path: Option<PathBuf>,
     #[serde(rename = "RomsPath")]
     pub roms_path: PathBuf,
     #[serde(rename = "DefaultImagePath")]
