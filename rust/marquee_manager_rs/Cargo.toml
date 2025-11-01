@@ -13,3 +13,4 @@ serde = { version = "1.0", features = ["derive"] }
 serde_ini = "0.2"
 glob = "0.3.0"
 url = "2.2"
+simplelog = "0.12"

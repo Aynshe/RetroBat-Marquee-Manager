@@ -2,6 +2,7 @@ use crate::config::Config;
 use crate::marquee::{self, MarqueeType};
 use crate::process;
 use crate::state::AppState;
+use log::{error, info};
 
 use notify::{Config as NotifyConfig, RecommendedWatcher, RecursiveMode, Watcher};
 use std::collections::HashMap;
@@ -21,12 +22,14 @@ pub fn start_watching(
 
     // Ensure the file exists before watching
     if !event_file_path.exists() {
-        fs::File::create(&event_file_path).expect("Failed to create event file");
+        if let Err(e) = fs::File::create(&event_file_path) {
+            error!("Failed to create event file: {}", e);
+        }
     }
 
     watcher.watch(&event_file_path, RecursiveMode::NonRecursive)?;
 
-    println!("Watching for events in ESEvent.arg...");
+    info!("Watching for events in ESEvent.arg...");
 
     loop {
         match rx.recv() {
@@ -37,8 +40,8 @@ pub fn start_watching(
                     }
                 }
             }
-            Ok(Err(e)) => eprintln!("Watch error: {:?}", e),
-            Err(e) => eprintln!("Channel receive error: {:?}", e),
+            Ok(Err(e)) => error!("Watch error: {:?}", e),
+            Err(e) => error!("Channel receive error: {:?}", e),
         }
     }
 }
@@ -57,7 +60,7 @@ fn handle_event(
     let param1 = params.get("param1").cloned().unwrap_or_default();
     let param2 = params.get("param2").cloned().unwrap_or_default();
 
-    println!("Event received: {}, param1: {}, param2: {}", event, param1, param2);
+    info!("Event received: {}, param1: {}, param2: {}", event, param1, param2);
 
     let marquee_type = match event.as_str() {
         "system-selected" => Some(MarqueeType::System {
@@ -76,7 +79,7 @@ fn handle_event(
 
     if let Some(mt) = marquee_type {
         let marquee_file = marquee::find_marquee_file(mt, config, systems);
-        println!("Updating marquee to: {:?}", marquee_file);
+        info!("Updating marquee to: {:?}", marquee_file);
         process::update_marquee(&marquee_file, config);
     }
 }
