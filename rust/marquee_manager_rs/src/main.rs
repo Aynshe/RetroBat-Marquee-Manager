@@ -34,18 +34,23 @@ fn main() {
         }
     };
 
-    // --- RetroBat Path Logic ---
-    if config.settings.retrobat_path.is_none() {
+    // --- RetroBat Path and Path Completion Logic ---
+    let retrobat_path = if let Some(path) = config.settings.retrobat_path.clone() {
+        info!("Using RetroBatPath from config.ini: {:?}", path);
+        path
+    } else {
         warn!("RetroBatPath not found in config.ini. Attempting to read from Windows Registry...");
         if let Some(path_str) = registry::get_retrobat_path() {
             info!("Found RetroBat path in registry: {}", path_str);
-            config.settings.retrobat_path = Some(PathBuf::from(path_str));
+            PathBuf::from(path_str)
         } else {
             error!("Could not find RetroBat installation path in config or registry. Exiting.");
             return;
         }
-    }
-    // --- End RetroBat Path Logic ---
+    };
+    config.complete_paths(&retrobat_path);
+    config.settings.retrobat_path = Some(retrobat_path);
+    // --- End Logic ---
 
 
     let systems_path = Path::new("."); // In a real scenario, this would come from the config

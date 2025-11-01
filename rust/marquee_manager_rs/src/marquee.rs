@@ -20,15 +20,16 @@ pub fn find_marquee_file(
     config: &Config,
     systems: &HashMap<String, String>,
 ) -> PathBuf {
+    let default_path = config.settings.default_image_path.as_ref().unwrap().clone();
     match marquee_type {
         MarqueeType::System { system_name } => {
-            find_system_marquee(system_name, config, systems).unwrap_or_else(|| config.settings.default_image_path.clone())
+            find_system_marquee(system_name, config, systems).unwrap_or(default_path)
         }
         MarqueeType::Game { system_name, game_name } => {
-            find_game_marquee(system_name, game_name, config, systems).unwrap_or_else(|| config.settings.default_image_path.clone())
+            find_game_marquee(system_name, game_name, config, systems).unwrap_or(default_path)
         }
         MarqueeType::Collection { collection_name } => {
-            find_collection_marquee(collection_name, config).unwrap_or_else(|| config.settings.default_image_path.clone())
+            find_collection_marquee(collection_name, config).unwrap_or(default_path)
         }
     }
 }
@@ -40,7 +41,7 @@ fn find_system_marquee(
 ) -> Option<PathBuf> {
     let system_folder = systems.get(system_name).map(|s| s.as_str()).unwrap_or(system_name);
     let marquee_path_str = config.settings.system_file_path.replace("{system_name}", system_folder);
-    let full_marquee_path = config.settings.system_marquee_path.join(marquee_path_str);
+    let full_marquee_path = config.settings.system_marquee_path.as_ref().unwrap().join(marquee_path_str);
     find_file(&full_marquee_path, &config.settings.accepted_formats)
 }
 
@@ -55,7 +56,7 @@ fn find_game_marquee(
         .replace("{system_name}", system_folder)
         .replace("{game_name}", game_name);
 
-    let full_marquee_path = config.settings.marquee_image_path.join(marquee_path_str);
+    let full_marquee_path = config.settings.marquee_image_path.as_ref().unwrap().join(marquee_path_str);
     if let Some(path) = find_file(&full_marquee_path, &config.settings.accepted_formats) {
         return Some(path);
     }
@@ -64,7 +65,7 @@ fn find_game_marquee(
         .replace("{system_name}", system_folder)
         .replace("{game_name}", game_name);
 
-    let full_marquee_path_default = config.settings.marquee_image_path_default.join(marquee_path_default_str);
+    let full_marquee_path_default = config.settings.marquee_image_path_default.as_ref().unwrap().join(marquee_path_default_str);
     if let Some(path) = find_file(&full_marquee_path_default, &config.settings.accepted_formats) {
         return Some(path);
     }
@@ -74,7 +75,7 @@ fn find_game_marquee(
 
 fn find_collection_marquee(collection_name: &str, config: &Config) -> Option<PathBuf> {
     let marquee_path_str = config.settings.collection_file_path.replace("{collection_name}", collection_name);
-    let full_marquee_path = config.settings.collection_marquee_path.join(marquee_path_str);
+    let full_marquee_path = config.settings.collection_marquee_path.as_ref().unwrap().join(marquee_path_str);
     find_file(&full_marquee_path, &config.settings.accepted_formats)
 }
 

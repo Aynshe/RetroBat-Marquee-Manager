@@ -10,10 +10,10 @@ pub fn launch_media_player(config: &Config) {
     kill_media_player(config);
 
     let launch_command = config.settings.mpv_launch_command
-        .replace("{MPVPath}", config.settings.mpv_path.to_str().unwrap_or(""))
+        .replace("{MPVPath}", config.settings.mpv_path.as_ref().unwrap().to_str().unwrap_or(""))
         .replace("{IPCChannel}", &config.settings.ipc_channel)
         .replace("{ScreenNumber}", &config.settings.screen_number.to_string())
-        .replace("{DefaultImagePath}", config.settings.default_image_path.to_str().unwrap_or(""));
+        .replace("{DefaultImagePath}", config.settings.default_image_path.as_ref().unwrap().to_str().unwrap_or(""));
 
     info!("Launching MPV with command: {}", launch_command);
 

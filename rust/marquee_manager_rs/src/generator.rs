@@ -1,4 +1,5 @@
 use crate::config::Config;
+use log::info;
 use std::path::{Path, PathBuf};
 use std::process::Command;
 
@@ -11,15 +12,15 @@ pub fn autogen_marquee(
     let logo_path = find_logo_file(system_name, game_name, config);
 
     if let (Some(fanart), Some(logo)) = (fanart_path, logo_path) {
-        let target_path = config.settings.marquee_image_path.join(format!("{}-{}-generated.png", system_name, game_name));
+        let target_path = config.settings.marquee_image_path.as_ref().unwrap().join(format!("{}-{}-generated.png", system_name, game_name));
 
         let convert_command = config.settings.im_convert_command
-            .replace("{IMPath}", config.settings.im_path.to_str().unwrap_or(""))
+            .replace("{IMPath}", config.settings.im_path.as_ref().unwrap().to_str().unwrap_or(""))
             .replace("{FanartPath}", fanart.to_str().unwrap_or(""))
             .replace("{LogoPath}", logo.to_str().unwrap_or(""))
             .replace("{ImgTargetPath}", target_path.to_str().unwrap_or(""));
 
-        println!("Generating marquee with command: {}", convert_command);
+        info!("Generating marquee with command: {}", convert_command);
 
         let mut cmd = Command::new("cmd");
         cmd.arg("/C").arg(convert_command);
@@ -32,7 +33,7 @@ pub fn autogen_marquee(
 }
 
 fn find_fanart_file(system_name: &str, game_name: &str, config: &Config) -> Option<PathBuf> {
-    let fanart_path = config.settings.roms_path.join(system_name).join("images").join(format!("{}-fanart.jpg", game_name));
+    let fanart_path = config.settings.roms_path.as_ref().unwrap().join(system_name).join("images").join(format!("{}-fanart.jpg", game_name));
     if fanart_path.exists() {
         return Some(fanart_path);
     }
@@ -40,7 +41,7 @@ fn find_fanart_file(system_name: &str, game_name: &str, config: &Config) -> Opti
 }
 
 fn find_logo_file(system_name: &str, game_name: &str, config: &Config) -> Option<PathBuf> {
-    let logo_path = config.settings.roms_path.join(system_name).join("images").join(format!("{}-marquee.png", game_name));
+    let logo_path = config.settings.roms_path.as_ref().unwrap().join(system_name).join("images").join(format!("{}-marquee.png", game_name));
     if logo_path.exists() {
         return Some(logo_path);
     }
